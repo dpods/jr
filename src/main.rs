@@ -51,7 +51,8 @@ fn main() {
         },
         None => {
             let mut stdin_buffer = String::new();
-            io::stdin().read_to_string(&mut stdin_buffer).expect("could not read file");
+            io::stdin().read_to_string(&mut stdin_buffer)
+                .expect("could not read from stdin");
             stdin_buffer
         }
     };
@@ -59,7 +60,7 @@ fn main() {
     let indent_level: &str = matches.value_of("indent").unwrap_or("4");
     let indent_string = match INDENT_LEVELS.get(indent_level) {
         Some(s) => s,
-        None => panic!("Invalid indent level")
+        None => panic!("Invalid indent level. Please choose a value from 0-8")
     };
 
     let json: Value = match serde_json::from_str(&input_string) {
@@ -74,8 +75,6 @@ fn main() {
     let formatter = serde_json::ser::PrettyFormatter::with_indent(indent_string.as_bytes());
     let mut ser = serde_json::Serializer::with_formatter(buf, formatter);
     json.serialize(&mut ser).unwrap();
-    // let json = to_colored_json_auto(&json)?;
-    let output = String::from_utf8(ser.into_inner()).unwrap().to_owned();
 
-    println!("{}", output);
+    println!("{}", String::from_utf8(ser.into_inner()).unwrap().to_owned());
 }
